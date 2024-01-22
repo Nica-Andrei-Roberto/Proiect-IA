@@ -1,0 +1,154 @@
+import PySimpleGUI as sg
+import math
+
+# Tema si stilul
+sg.theme('SystemDefault1')
+sg.set_options(font=('Segoe UI', 18), element_padding=(5, 5), button_element_size=(4, 2))
+
+# Calculator simplu
+calculator_layout = [
+    [sg.InputText(size=(20, 1),pad=(0,1), key='-DISPLAY-', justification='right', background_color='#F0F0F0', text_color='#000'), sg.Button('⌫',size=(6,1),pad=(1,1))],
+    [sg.Button('√',size=(6,2),pad=(1,1)), sg.Button('x²',size=(6,2),pad=(1,1)), sg.Button('C',size=(6,2),pad=(1,1)), sg.Button('/',size=(6,2),pad=(1,1))],
+    [sg.Button('7',size=(6,2),pad=(1,1)), sg.Button('8',size=(6,2),pad=(1,1)), sg.Button('9',size=(6,2),pad=(1,1)), sg.Button('*',size=(6,2),pad=(1,1))],
+    [sg.Button('4',size=(6,2),pad=(1,1)), sg.Button('5',size=(6,2),pad=(1,1)), sg.Button('6',size=(6,2),pad=(1,1)), sg.Button('-',size=(6,2),pad=(1,1))],
+    [sg.Button('1',size=(6,2),pad=(1,1)), sg.Button('2',size=(6,2),pad=(1,1)), sg.Button('3',size=(6,2),pad=(1,1)), sg.Button('+',size=(6,2),pad=(1,1))],
+    [sg.Button('+/-',size=(6,2),pad=(1,1)), sg.Button('0',size=(6,2),pad=(1,1)), sg.Button('.',size=(6,2),pad=(1,1)), sg.Button('=',size=(6,2),pad=(1,1))],
+]
+
+# Calculator de temperatura
+temperature_layout = [
+    [sg.InputText(size=(30,1), key='-TEMP_DISPLAY-', justification='right', background_color='#F0F0F0', text_color='#000')],
+    [sg.Button('Celsius -> Fahrenheit',size=(30,1))],
+    [sg.Button('Celsius -> Kelvin',size=(30,1))],
+    [sg.Button('Fahrenheit -> Celsius',size=(30,1))],
+    [sg.Button('Fahrenheit -> Kelvin',size=(30,1))],
+    [sg.Button('Kelvin -> Celsius', size=(30, 1))],
+    [sg.Button('Kelvin -> Fahrenheit', size=(30, 1))],
+]
+
+# Main layout
+main_layout = [
+    [sg.Button('Basic', size=(13,0),pad=(1,1)), sg.Button('Temperature', size=(13,0),pad=(1,1))],
+    [sg.Column(calculator_layout, key='-CALCULATOR-', visible=True),
+     sg.Column(temperature_layout, key='-TEMPERATURE-', visible=False)],
+]
+
+window = sg.Window('Multi-Calculator', main_layout, size=(370, 570))
+
+# Event loop
+equation = ''
+while True:
+    event, values = window.read()
+
+    if event == sg.WIN_CLOSED:
+        break
+
+    # Switch between calculator and temperature layouts
+    if event == 'Basic':
+        window['-CALCULATOR-'].update(visible=True)
+        window['-TEMPERATURE-'].update(visible=False)
+    elif event == 'Temperature':
+        window['-CALCULATOR-'].update(visible=False)
+        window['-TEMPERATURE-'].update(visible=True)
+
+ # Calculator simplu
+    
+    if event in '1234567890./*-+':
+        equation += event
+        window['-DISPLAY-'].update(equation)
+
+    elif event == '=':
+        try:
+            result = eval(equation)
+            window['-DISPLAY-'].update(result)
+            equation = str(result)
+        except:
+            window['-DISPLAY-'].update('Error')
+            equation = ''
+
+    elif event == 'C':
+        window['-DISPLAY-'].update('')
+        equation = ''
+
+    elif event == '√':
+        try:
+            result = math.sqrt(float(equation))
+            window['-DISPLAY-'].update(result)
+            equation = str(result)
+        except:
+            window['-DISPLAY-'].update('Error')
+            equation = ''
+
+    elif event == 'x²':
+        try:
+            result = float(equation) ** 2
+            window['-DISPLAY-'].update(result)
+            equation = str(result)
+        except:
+            window['-DISPLAY-'].update('Error')
+            equation = ''
+
+    elif event == '+/-':
+        try:
+            current_number = float(equation)
+            result = -current_number
+            window['-DISPLAY-'].update(result)
+            equation = str(result)
+        except:
+            window['-DISPLAY-'].update('Error')
+            equation = ''
+
+    elif event == '⌫':
+        equation = equation[:-1]
+        window['-DISPLAY-'].update(equation)
+    
+    # Calculator de temperatura
+    elif event == 'Celsius -> Fahrenheit':
+        try:
+            celsius = float(values['-TEMP_DISPLAY-'])
+            fahrenheit = (celsius * 9/5) + 32
+            window['-TEMP_DISPLAY-'].update(fahrenheit)
+        except:
+            window['-TEMP_DISPLAY-'].update('Error')
+
+    elif event == 'Fahrenheit -> Celsius':
+        try:
+            fahrenheit = float(values['-TEMP_DISPLAY-'])
+            celsius = (fahrenheit - 32) * 5/9
+            window['-TEMP_DISPLAY-'].update(celsius)
+        except:
+            window['-TEMP_DISPLAY-'].update('Error')
+
+    elif event == 'Celsius -> Kelvin':
+        try:
+            celsius = float(values['-TEMP_DISPLAY-'])
+            kelvin = celsius + 273.15
+            window['-TEMP_DISPLAY-'].update(kelvin)
+        except:
+            window['-TEMP_DISPLAY-'].update('Error')
+
+    elif event == 'Fahrenheit -> Kelvin':
+        try:
+            fahrenheit = float(values['-TEMP_DISPLAY-'])
+            kelvin = (fahrenheit - 32) * 5/9 + 273.15
+            window['-TEMP_DISPLAY-'].update(kelvin)
+        except:
+            window['-TEMP_DISPLAY-'].update('Error')
+
+    elif event == 'Kelvin -> Celsius':
+        try:
+            kelvin = float(values['-TEMP_DISPLAY-'])
+            celsius = kelvin - 273.15
+            window['-TEMP_DISPLAY-'].update(celsius)
+        except:
+            window['-TEMP_DISPLAY-'].update('Error')
+
+    elif event == 'Kelvin -> Fahrenheit':
+        try:
+            kelvin = float(values['-TEMP_DISPLAY-'])
+            fahrenheit = (kelvin - 273.15) * 9/5 + 32
+            window['-TEMP_DISPLAY-'].update(fahrenheit)
+        except:
+            window['-TEMP_DISPLAY-'].update('Error')
+
+window.close()
